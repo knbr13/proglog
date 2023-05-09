@@ -27,4 +27,19 @@ const updateScore = async (req, res) => {
   }
 };
 
-module.exports = { addUser, updateScore };
+const getUsersWithHighestScores = async () => {
+  const { limit = 5, pageNumber = 1 } = req.body;
+  const skip = (pageNumber - 1) * limit;
+
+  try {
+    const users = await User.find()
+      .sort({ flipsScore: 1 })
+      .skip(skip)
+      .limit(limit);
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+module.exports = { addUser, updateScore, getUsersWithHighestScores };
