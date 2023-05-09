@@ -14,6 +14,7 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    
+    flipsScore: Number,
+    timeScore: Number,
 }, { timestamps: true });
 module.exports = mongoose.model("User", userSchema);
