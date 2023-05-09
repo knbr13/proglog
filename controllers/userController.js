@@ -12,4 +12,19 @@ const addUser = async (req, res) => {
   }
 };
 
-module.exports = { addUser };
+const updateScore = async (req, res) => {
+  const { email, flipsScore, timeScore } = req.body;
+  try {
+    const user = await User.find({ email });
+    if (!user) return res.status(404).json({ error: "No such user" });
+    await User.updateOne({
+      flipsScore: Math.min(flipsScore, user.flipsScore),
+      timeScore: Math.min(timeScore, user.timeScore),
+    });
+    res.status(200).json({ message: "success" });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+module.exports = { addUser, updateScore };
