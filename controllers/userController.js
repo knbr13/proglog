@@ -35,21 +35,24 @@ const getUsersWithHighestScores = async (req, res) => {
   const { limit = 5, pageNumber = 1, scoreField = "flipsScore" } = req.query;
   const skip = (pageNumber - 1) * limit;
 
-  if (scoreField !== "flipsScore" || scoreField !== "timeScore")
+  if (scoreField !== "flipsScore" && scoreField !== "timeScore")
     return res.status(400).json({ error: "invalid score field" });
 
   try {
     const sortOption = {};
     sortOption[scoreField] = 1;
     const users = await User.find().sort(sortOption).skip(skip).limit(limit);
-    res.status(200).json(users);
+    const totalPages = await User.countDocuments();
+    res
+      .status(200)
+      .json({ users, totalPages: Math.ceil(totalPages / parseInt(limit)) });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
 const getUserRank = async (req, res) => {
-  const { email } = req.body;
+  const { email } = req.query;
   if (!email)
     return res.status(400).json({ error: "Missing some requierd data!" });
   try {
