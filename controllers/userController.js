@@ -32,14 +32,16 @@ const updateScore = async (req, res) => {
 };
 
 const getUsersWithHighestScores = async () => {
-  const { limit = 5, pageNumber = 1 } = req.body;
+  const { limit = 5, pageNumber = 1, scoreField = "flipsScore" } = req.query;
   const skip = (pageNumber - 1) * limit;
 
+  if (scoreField !== "flipsScore" || scoreField !== "timeScore")
+    return res.status(400).json({ error: "invalid score field" });
+
   try {
-    const users = await User.find()
-      .sort({ flipsScore: 1 })
-      .skip(skip)
-      .limit(limit);
+    const sortOption = {};
+    sortOption[scoreField] = 1;
+    const users = await User.find().sort(sortOption).skip(skip).limit(limit);
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
@@ -63,4 +65,9 @@ const getUserRank = async (req, res) => {
   }
 };
 
-module.exports = { addUser, updateScore, getUsersWithHighestScores, getUserRank };
+module.exports = {
+  addUser,
+  updateScore,
+  getUsersWithHighestScores,
+  getUserRank,
+};
