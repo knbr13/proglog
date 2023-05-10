@@ -31,7 +31,7 @@ const updateScore = async (req, res) => {
   }
 };
 
-const getUsersWithHighestScores = async () => {
+const getUsersWithHighestScores = async (req, res) => {
   const { limit = 5, pageNumber = 1, scoreField = "flipsScore" } = req.query;
   const skip = (pageNumber - 1) * limit;
 
