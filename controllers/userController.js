@@ -5,9 +5,12 @@ const addUser = async (req, res) => {
   if (!name || !picture || !email)
     return res.status(400).json({ error: "Missing some requierd data!" });
   try {
+    const userExist = await User.findOne({ email });
+    if (userExist) return res.status(200).json(userExist);
     const user = await User.create({ name, email, picture });
     res.status(201).json(user);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
