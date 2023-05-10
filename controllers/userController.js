@@ -46,4 +46,21 @@ const getUsersWithHighestScores = async () => {
   }
 };
 
-module.exports = { addUser, updateScore, getUsersWithHighestScores };
+const getUserRank = async (req, res) => {
+  const { email } = req.body;
+  if (!email)
+    return res.status(400).json({ error: "Missing some requierd data!" });
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ error: "No such user" });
+    const higherRankCount = await User.countDocuments({
+      flipsScore: { $gt: user.flipsScore },
+    });
+    const userRank = higherRankCount + 1;
+    res.status(200).json({ rank: userRank });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+module.exports = { addUser, updateScore, getUsersWithHighestScores, getUserRank };
