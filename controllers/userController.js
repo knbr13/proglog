@@ -20,10 +20,13 @@ const updateScore = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: "No such user" });
-    await User.updateOne({
-      flipsScore: Math.min(parseInt(flipsScore), user.flipsScore || 9999),
-      timeScore: Math.min(parseInt(timeScore), user.timeScore || 9999999),
-    });
+    await User.updateOne(
+      { email },
+      {
+        flipsScore: Math.min(parseInt(flipsScore), user.flipsScore || 9999),
+        timeScore: Math.min(parseInt(timeScore), user.timeScore || 9999999),
+      }
+    );
     res.status(200).json({ message: "success" });
   } catch (error) {
     console.log(error);
@@ -41,11 +44,19 @@ const getUsersWithHighestScores = async (req, res) => {
   try {
     const sortOption = {};
     sortOption[scoreField] = 1;
-    const users = await User.find().sort(sortOption).skip(skip).limit(limit);
-    const totalPages = await User.countDocuments();
-    res
-      .status(200)
-      .json({ users, totalPages: Math.ceil(totalPages / parseInt(limit)) });
+    const query = {
+      [scoreField]: { $exists: true },
+    };
+
+    const users = await User.find(query)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit);
+
+    const totalUsers = await User.countDocuments(query);
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    res.status(200).json({ users, totalPages });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
