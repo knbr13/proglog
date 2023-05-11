@@ -18,7 +18,7 @@ const addUser = async (req, res) => {
 const updateScore = async (req, res) => {
   const { email, flipsScore, timeScore } = req.body;
   try {
-    const user = await User.find({ email });
+    const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: "No such user" });
     await User.updateOne({
       flipsScore: Math.min(parseInt(flipsScore), user.flipsScore || 9999),
