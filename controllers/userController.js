@@ -19,14 +19,15 @@ const updateScore = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: "No such user" });
-    await User.updateOne(
+    const updatedUser = await User.updateOne(
       { email },
       {
         flipsScore: Math.min(parseInt(flipsScore), user.flipsScore || 9999),
         timeScore: Math.min(parseInt(timeScore), user.timeScore || 9999999),
-      }
+      },
+      { new: true }
     );
-    res.status(200).json({ message: "success" });
+    res.status(200).json(updatedUser);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
