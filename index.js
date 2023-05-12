@@ -6,7 +6,7 @@ const userRouter = require("./routes/userRoutes");
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({origin: 'https://match-with-spongebob.netlify.app'}));
 app.use("/user", userRouter);
 
 mongoose.connect(process.env.MONGO_DB_URI).then(() => {
