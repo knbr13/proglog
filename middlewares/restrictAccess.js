@@ -1,4 +1,4 @@
-const allowedDomain = "https://match-with-spongebob.netlify.com";
+const allowedDomain = "https://match-with-spongebob.netlify.app";
 const restrictAccess = (req, res, next) => {
   const origin = req.headers.origin;
 
