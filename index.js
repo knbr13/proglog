@@ -8,7 +8,7 @@ const { restrictAccess } = require("./middlewares/restrictAccess");
 const app = express();
 app.use(restrictAccess);
 app.use(express.json());
-app.use(cors({ origin: "https://match-with-spongebob.netlify.app" }));
+app.use(cors());
 app.use("/user", userRouter);
 
 mongoose.connect(process.env.MONGO_DB_URI).then(() => {
