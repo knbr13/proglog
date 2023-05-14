@@ -42,10 +42,17 @@ const getUsersWithHighestScores = async (req, res) => {
 
   try {
     const sortOption = {};
-    sortOption[scoreField] = 1;
     const query = {
       [scoreField]: { $exists: true },
     };
+
+    if (scoreField === "flipsScore") {
+      sortOption.flipsScore = 1;
+      sortOption.timeScore = 1;
+    } else if (scoreField === "timeScore") {
+      sortOption.timeScore = 1;
+      sortOption.flipsScore = 1;
+    }
 
     const users = await User.find(query)
       .sort(sortOption)
@@ -60,6 +67,7 @@ const getUsersWithHighestScores = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 const getUserRank = async (req, res) => {
   const { email } = req.query;
