@@ -19,7 +19,7 @@ const updateScore = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: "No such user" });
-    const updatedUser = await User.updateOne(
+    await User.updateOne(
       { email },
       {
         flipsScore: Math.min(parseInt(flipsScore), user.flipsScore || 9999),
@@ -27,7 +27,8 @@ const updateScore = async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).json(updatedUser);
+    const updatedUserInfo = await User.findOne({ email });
+    res.status(200).json(updatedUserInfo);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
@@ -67,7 +68,6 @@ const getUsersWithHighestScores = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 const getUserRank = async (req, res) => {
   const { email } = req.query;
