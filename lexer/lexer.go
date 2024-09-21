@@ -47,6 +47,13 @@ func (l *Lexer) NextToken() token.Token {
 	case 0:
 		tok.Literal = "" // redundant
 		tok.Type = token.EOF
+	default:
+		if isLetter(l.ch) {
+			tok.Literal = l.readIdentifier()
+			tok.Type = token.LookupIdent(tok.Literal)
+			return tok
+		}
+		tok = newToken(token.ILLEGAL, l.ch)
 	}
 	l.readChar()
 	return tok
