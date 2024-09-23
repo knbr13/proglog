@@ -12,11 +12,16 @@ const (
 	EOF     = "EOF"
 	// Identifiers + literals
 	IDENT = "IDENT" // add, foobar, x, y, ...
-	INT   = "INT"
-	// 1343456
+	INT   = "INT"   // 1343456
 	// Operators
-	ASSIGN = "="
-	PLUS   = "+"
+	ASSIGN   = "="
+	PLUS     = "+"
+	MINUS    = "-"
+	BANG     = "!"
+	ASTERISK = "*"
+	SLASH    = "/"
+	LT       = "<"
+	GT       = ">"
 	// Delimiters
 	COMMA     = ","
 	SEMICOLON = ";"
