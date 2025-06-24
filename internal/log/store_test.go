@@ -38,6 +38,7 @@ func testAppend(t *testing.T, s *store) {
 		require.Equal(t, pos+n, width*i)
 	}
 }
+
 func testRead(t *testing.T, s *store) {
 	t.Helper()
 
@@ -50,6 +51,7 @@ func testRead(t *testing.T, s *store) {
 		pos += width
 	}
 }
+
 func testReadAt(t *testing.T, s *store) {
 	t.Helper()
 
