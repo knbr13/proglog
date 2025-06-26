@@ -93,6 +93,19 @@ func (s *segment) IsMaxed() bool {
 		s.index.size >= s.config.Segment.MaxIndexBytes
 }
 
+func (s *segment) Remove() error {
+	if err := s.Close(); err != nil {
+		return err
+	}
+	if err := os.Remove(s.index.Name()); err != nil {
+		return err
+	}
+	if err := os.Remove(s.store.Name()); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *segment) Close() error {
 	if err := s.index.Close(); err != nil {
 		return err
