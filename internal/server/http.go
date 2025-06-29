@@ -2,13 +2,17 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/knbr13/proglog/internal/log"
 )
 
-func NewHTTPServer(addr string) *http.Server {
-	httpsrv := newHTTPServer()
+var ErrOffsetNotFound = fmt.Errorf("offset not found")
+
+func NewHTTPServer(addr string, log *log.Log) *http.Server {
+	httpsrv := newHTTPServer(log)
 	r := mux.NewRouter()
 	r.HandleFunc("/", httpsrv.handleProduce).Methods("POST")
 	r.HandleFunc("/", httpsrv.handleConsume).Methods("GET")
@@ -19,17 +23,17 @@ func NewHTTPServer(addr string) *http.Server {
 }
 
 type httpServer struct {
-	Log *Log
+	Log *log.Log
 }
 
-func newHTTPServer() *httpServer {
+func newHTTPServer(log *log.Log) *httpServer {
 	return &httpServer{
-		Log: NewLog(),
+		Log: log,
 	}
 }
 
 type ProduceRequest struct {
-	Record Record `json:"record"`
+	Record log.Record `json:"record"`
 }
 
 type ProduceResponse struct {
@@ -41,7 +45,7 @@ type ConsumeRequest struct {
 }
 
 type ConsumeResponse struct {
-	Record Record `json:"record"`
+	Record log.Record `json:"record"`
 }
 
 func (s *httpServer) handleProduce(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +55,7 @@ func (s *httpServer) handleProduce(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	off, err := s.Log.Append(req.Record)
+	off, err := s.Log.Append(&req.Record)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -72,15 +76,11 @@ func (s *httpServer) handleConsume(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	record, err := s.Log.Read(req.Offset)
-	if err == ErrOffsetNotFound {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	res := ConsumeResponse{Record: record}
+	res := ConsumeResponse{Record: *record}
 	err = json.NewEncoder(w).Encode(res)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
