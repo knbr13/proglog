@@ -10,7 +10,7 @@ import (
 )
 
 func TestSegment(t *testing.T) {
-	dir := os.TempDir()
+	dir := t.TempDir()
 	defer os.RemoveAll(dir)
 
 	want := &api.Record{Value: []byte("hello world")}
