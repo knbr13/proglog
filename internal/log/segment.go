@@ -1,12 +1,10 @@
 package log
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
-
-	api "github.com/knbr13/proglog/api/v1"
-	"google.golang.org/protobuf/proto"
 )
 
 type segment struct {
@@ -52,10 +50,10 @@ func newSegment(dir string, baseOffset uint64, c Config) (*segment, error) {
 	return s, nil
 }
 
-func (s *segment) Append(record *api.Record) (offset uint64, err error) {
+func (s *segment) Append(record *Record) (offset uint64, err error) {
 	cur := s.nextOffset
 	record.Offset = cur
-	p, err := proto.Marshal(record)
+	p, err := json.Marshal(record)
 	if err != nil {
 		return 0, err
 	}
@@ -74,7 +72,7 @@ func (s *segment) Append(record *api.Record) (offset uint64, err error) {
 	return cur, nil
 }
 
-func (s *segment) Read(off uint64) (*api.Record, error) {
+func (s *segment) Read(off uint64) (*Record, error) {
 	_, pos, err := s.index.Read(int64(off - s.baseOffset))
 	if err != nil {
 		return nil, err
@@ -83,8 +81,8 @@ func (s *segment) Read(off uint64) (*api.Record, error) {
 	if err != nil {
 		return nil, err
 	}
-	record := &api.Record{}
-	err = proto.Unmarshal(p, record)
+	record := &Record{}
+	err = json.Unmarshal(p, record)
 	return record, err
 }
 
